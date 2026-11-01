@@ -35,12 +35,27 @@ st.markdown("""
 # Sidebar settings for zero-friction setup
 with st.sidebar:
     st.header("⚙️ Configuration")
-    user_api_key = st.text_input(
-        "Gemini API Key (Optional)",
-        type="password",
-        value=config.GEMINI_API_KEY,
-        help="If left empty, system operates in offline mock mode without errors!"
-    )
+    
+    # Check if a system/server key is configured (from .env or Streamlit Secrets)
+    has_system_key = bool(config.GEMINI_API_KEY)
+    
+    if has_system_key:
+        st.success("🔒 System API Key: Configured & Secured")
+        custom_key = st.text_input(
+            "Override with Custom Key (Optional)",
+            type="password",
+            value="",
+            help="Leave blank to use the secure server-configured Gemini API key."
+        )
+        active_api_key = custom_key if custom_key else config.GEMINI_API_KEY
+    else:
+        active_api_key = st.text_input(
+            "Gemini API Key (Optional)",
+            type="password",
+            value="",
+            help="If left empty, system operates in offline mock mode without errors!"
+        )
+
     selected_model = st.selectbox(
         "Gemini Model",
         ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"],
@@ -48,10 +63,10 @@ with st.sidebar:
     )
     mode = st.radio(
         "Execution Mode",
-        ["Gemini API" if user_api_key else "Offline Mock Mode (No Key Needed)", "Force Offline Mock"],
-        index=0 if user_api_key else 1
+        ["Gemini API" if active_api_key else "Offline Mock Mode (No Key Needed)", "Force Offline Mock"],
+        index=0 if active_api_key else 1
     )
-    use_mock = (mode == "Force Offline Mock" or not user_api_key)
+    use_mock = (mode == "Force Offline Mock" or not active_api_key)
     
     st.divider()
     st.markdown("""
@@ -86,9 +101,9 @@ with tab_gen:
             st.warning("Please provide a brief text or upload a document first.")
         else:
             with st.spinner("Processing brief: Guarding input → Calling LLM → Pydantic Validation → Generating PPTX..."):
-                if not use_mock and user_api_key:
+                if not use_mock and active_api_key:
                     import os
-                    os.environ["GEMINI_API_KEY"] = user_api_key
+                    os.environ["GEMINI_API_KEY"] = active_api_key
                     prov = get_provider("gemini")
                 else:
                     prov = get_provider("mock")
