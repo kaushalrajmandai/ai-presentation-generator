@@ -1,0 +1,18 @@
+# Environment secrets (Never commit real API keys to GitHub!)
+.env
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+.pytest_cache/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Local databases and temporary runs
+*.db
+
