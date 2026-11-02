@@ -2,6 +2,8 @@
 
 Brief in -> validated slide content + speaker notes + PPTX out. Fully automated.
 
+Deployed Link - https://kaushal-slidegen.streamlit.app/
+
 ## Setup
 ```
 pip install -r requirements.txt
